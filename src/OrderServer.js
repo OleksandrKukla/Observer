@@ -1,7 +1,8 @@
 const _order = Symbol('_order');
 
 class OrderServer {
-    constructor () {
+
+    constructor() {
         this[_order] = [];
     }
 
@@ -17,12 +18,18 @@ class OrderServer {
         delete this[name];
     }
 
-    check (name) {
+    check(name) {
         return this.hasOwnProperty(name);
     }
 
-    get (name) {
+    getItem(name) {
         return this[name];
+    }
+
+    eachInOrder(callback) {
+        for (name of this[_order]) {
+            callback(name, this[name]);
+        }
     }
 }
 

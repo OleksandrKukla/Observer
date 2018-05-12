@@ -33,7 +33,7 @@ class Observer {
         };
     }
 
-    _pathParser(eventPath) {
+    _parsePath(eventPath) {
         let pathArray;
 
         if (typeof eventPath !== 'string') {
@@ -49,61 +49,109 @@ class Observer {
         return pathArray;
     }
 
-    _addHandler(path, handlerObject, state = this[_state]) {
+    _walkRecursive({
+        path,
+        createIfEmpty,
+        state,
+        destinationCallback,
+        params
+    }) {
         let isLast = (path.length <= 1),
-            eventName = path.shift(), // returns first element and
-            newState;
+            eventName = path.shift(); // returns first element
 
-        if (!state.check(eventName)) {
+        if (!state.check(eventName) && createIfEmpty) {
             state.push(
                 eventName,
                 new OrderServer()
             );
         }
 
-        newState = state.get(eventName);
-
         if (isLast) {
-            newState.push(handlerObject.handlerId, handlerObject);
+            destinationCallback({state, eventName, params});
         } else {
-            this._addHandler(path, handlerObject, newState);
+            state = state.getItem(eventName);
+            this._walkRecursive({
+                path,
+                createIfEmpty,
+                state,
+                destinationCallback,
+                params
+            });
         }
     }
 
-    _removeEvent (path, state = this[_state]) {
-        let isLast = (path.length <= 1),
-            eventName = path.shift(), // returns first element and
-            newState;
+    _callTreeRecursive ({state, eventName, params}) {
+        // to avoid context issue
+        let _callTreeRecursive = ({state, eventName, params}) => {
+            if (eventName) {
+                state = eventName && state[eventName];
+            }
 
-        if (isLast) {
-            state.delete(eventName);
-        } else {
-            newState = state.get(eventName);
-            this._removeEvent(path, newState);
-        }
+            state.eachInOrder((name, element) => {
+                if (element.handler) {
+                    element.handler(params);
+                    ++element.callCounter;
+
+                    // if (
+                    //     element.callLimit
+                    //     && element.callCounter >= element.callLimit
+                    // ) {
+                    //     state.delete(name);
+                    // }
+
+                } else {
+                    // it is event, try recursion again
+                    _callTreeRecursive({state: element, params});
+                }
+            });
+        };
+
+        _callTreeRecursive({state, eventName, params});
     }
+
 
     // PUBLIC
 
     on(event, handler, callLimit = null) {
-        let eventPath = this._pathParser(event),
+        let path = this._parsePath(event),
             handlerObject = this._createHandlerObject(handler, callLimit);
 
-        this._addHandler(eventPath, handlerObject);
+        this._walkRecursive({
+            path,
+            createIfEmpty: true,
+            state: this[_state],
+            destinationCallback: ({state, eventName}) => {
+                let newState = state.getItem(eventName);
+                newState.push(handlerObject.handlerId, handlerObject);
+            }
+        });
     }
 
     off(event) {
-        let eventPath = this._pathParser(event);
+        let path = this._parsePath(event);
 
-        this._removeEvent(eventPath);
+        this._walkRecursive({
+            path,
+            state: this[_state],
+            destinationCallback: ({state, eventName}) => {
+                state.delete(eventName);
+            }
+        });
     }
 
     once(event, handler) {
-
+        this.on(event, handler, 1);
     }
 
-    trigger(event) {
+    trigger(event, params) {
+        let path = this._parsePath(event);
 
+        this._walkRecursive({
+            path,
+            state: this[_state],
+            params,
+            destinationCallback: this._callTreeRecursive
+        });
     }
 }
 
