@@ -5,6 +5,11 @@ const _state = Symbol('_handlersState');
 const _handlerPrefix = Symbol('_handlerPrefix');
 const _prefix = Symbol('_prefix');
 const _handlerCounter = Symbol('_handlerCounter');
+const _createHandlerId = Symbol('_createHandlerId');
+const _createHandlerObject = Symbol('_createHandlerObject');
+const _parsePath = Symbol('_parsePath');
+const _walkRecursive = Symbol('_walkRecursive');
+const _callTreeRecursive = Symbol('_callTreeRecursive');
 
 
 class Observer {
@@ -20,20 +25,20 @@ class Observer {
         this[_handlerCounter] = 0;
     }
 
-    _createHandlerId() {
+    [_createHandlerId]() {
         return (this[_prefix] + (this[_handlerCounter]++));
     }
 
-    _createHandlerObject(handler, callLimit) {
+    [_createHandlerObject](handler, callLimit) {
         return {
-            handlerId: this._createHandlerId(),
+            handlerId: this[_createHandlerId](),
             handler,
             callLimit,
             callCounter: 0
         };
     }
 
-    _parsePath(eventPath) {
+    [_parsePath](eventPath) {
         let pathArray;
 
         if (typeof eventPath !== 'string') {
@@ -49,7 +54,7 @@ class Observer {
         return pathArray;
     }
 
-    _walkRecursive({
+    [_walkRecursive]({
         path,
         createIfEmpty,
         state,
@@ -70,7 +75,7 @@ class Observer {
             destinationCallback({state, eventName, params});
         } else {
             state = state.getItem(eventName);
-            this._walkRecursive({
+            this[_walkRecursive]({
                 path,
                 createIfEmpty,
                 state,
@@ -80,43 +85,48 @@ class Observer {
         }
     }
 
-    _callTreeRecursive ({state, eventName, params}) {
+    [_callTreeRecursive] ({state, eventName, params}) {
         // to avoid context issue
         let _callTreeRecursive = ({state, eventName, params}) => {
-            if (eventName) {
-                state = eventName && state[eventName];
-            }
 
-            state.eachInOrder((name, element) => {
-                if (element.handler) {
-                    element.handler(params);
-                    ++element.callCounter;
+            return new Promise(async resolve => {
 
-                    // if (
-                    //     element.callLimit
-                    //     && element.callCounter >= element.callLimit
-                    // ) {
-                    //     state.delete(name);
-                    // }
+                state = (eventName && state[eventName])
+                    ? state[eventName]
+                    : state;
 
-                } else {
-                    // it is event, try recursion again
-                    _callTreeRecursive({state: element, params});
-                }
+                await state.eachInOrder(async function (name, element) {
+                    if (element.handler) {
+                        await element.handler(params);
+                        ++element.callCounter;
+
+                        if (
+                            element.callLimit
+                            && element.callCounter >= element.callLimit
+                        ) {
+                            state.delete(name);
+                        }
+
+                    } else {
+                        // it is event, try recursion again
+                        await _callTreeRecursive({state: element, params});
+                    }
+                });
+
+                resolve();
             });
         };
 
         _callTreeRecursive({state, eventName, params});
     }
 
-
     // PUBLIC
 
     on(event, handler, callLimit = null) {
-        let path = this._parsePath(event),
-            handlerObject = this._createHandlerObject(handler, callLimit);
+        let path = this[_parsePath](event),
+            handlerObject = this[_createHandlerObject](handler, callLimit);
 
-        this._walkRecursive({
+        this[_walkRecursive]({
             path,
             createIfEmpty: true,
             state: this[_state],
@@ -128,9 +138,9 @@ class Observer {
     }
 
     off(event) {
-        let path = this._parsePath(event);
+        let path = this[_parsePath](event);
 
-        this._walkRecursive({
+        this[_walkRecursive]({
             path,
             state: this[_state],
             destinationCallback: ({state, eventName}) => {
@@ -144,18 +154,15 @@ class Observer {
     }
 
     trigger(event, params) {
-        let path = this._parsePath(event);
+        let path = this[_parsePath](event);
 
-        this._walkRecursive({
+        this[_walkRecursive]({
             path,
             state: this[_state],
             params,
-            destinationCallback: this._callTreeRecursive
+            destinationCallback: this[_callTreeRecursive]
         });
     }
 }
-
-window.Observer = Observer;
-window.OrderServer = OrderServer;
 
 export default Observer;
