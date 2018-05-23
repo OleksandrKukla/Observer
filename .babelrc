@@ -1,9 +1,5 @@
 {
   "presets": [
-    "env",
-    "stage-2"
-  ],
-  "plugins": [
-    "babel-plugin-transform-class-properties"
+    "es2015-rollup"
   ]
 }
