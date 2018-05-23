@@ -18,7 +18,6 @@ class Observer {
         separator = '.',
         prefix = '__handler_id_'
     ) {
-        // init private
         this[_separator] = separator;
         this[_state] = new OrderServer();
         this[_prefix] = prefix;
@@ -119,8 +118,6 @@ class Observer {
 
         _callTreeRecursive({state, eventName, params});
     }
-
-    // PUBLIC
 
     on(event, handler, callLimit = null) {
         let path = this[_parsePath](event),

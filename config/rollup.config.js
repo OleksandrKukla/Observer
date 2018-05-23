@@ -13,7 +13,7 @@ export default {
     output: [
         {
             format: 'umd',
-            name: 'EventObserver',
+            name: 'EventsObserver',
             file: 'build/index.js',
             indent: '\t'
         }

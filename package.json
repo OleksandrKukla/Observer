@@ -1,12 +1,14 @@
 {
-  "name": "event-observer",
+  "name": "events-observer",
   "version": "1.0.0",
   "description": "Observer pattern",
   "author": "Oleksandr Kukla",
   "keywords": [
+    "events-observer",
     "event-observer",
     "observer",
     "event",
+    "events-emitter",
     "event-emitter",
     "emitter",
     "subscribe",
@@ -18,7 +20,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/OleksandrKukla/event-observer"
+    "url": "git+https://github.com/OleksandrKukla/events-observer"
   },
   "license": "MIT",
   "main": "build/index.min.js",
