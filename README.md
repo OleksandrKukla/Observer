@@ -1,7 +1,8 @@
 EventsObserver.js
 ========
 
-[![Latest NPM release]][npm-badge-url]
+[![Latest NPM release][npm-badge]][npm-badge-url]
+[![License][license-badge]][license-badge-url]
 
 ### EventsObserver javascript template ###
 
@@ -12,6 +13,9 @@ If event handler returns promise next handler will be executed only if previous 
 
 ### What is EVENTS TREE ? ###
 
-<img src="https://github.com/OleksandrKukla/events-observer/tree/master/src/img/scheme.png" width="100%" style="display: block;">
+<img src="https://raw.githubusercontent.com/OleksandrKukla/events-observer/master/src/img/scheme.png" width="100%" style="display: block;">
 
+[npm-badge]https://img.shields.io/npm/v/events-observer.svg
 [npm-badge-url]:https://www.npmjs.com/package/events-observer
+[license-badge]: https://img.shields.io/npm/l/events-observer.svg
+[license-badge-url]: ./LICENSE
