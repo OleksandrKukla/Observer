@@ -15,9 +15,9 @@ Install using npm
 ```
 npm i -s events-observer
 ```
-and then import constructor from events-observer npm module
+and then import constructor from `events-observer` npm module
 
-**OR**
+**or**
 
 download `EventsObserver.min.js` file from this repository root and include it to html (ES5 usage, this is last built version):
 ```html
@@ -29,17 +29,21 @@ If you have imported es6+ EventsObserver module
 ```javascript
 import EventsObserver from 'events-observer';
 ```
-or loaded it using `script tag` you should create instance of EventsObserver constructor.
+or loaded it using `script tag`, you should create instance of EventsObserver constructor.
 
 ```javascript
 var observer = new EventsObserver();
 ```
 
-also you can pass `separator` property to define how events patch should be parsed.
+Also, you can pass `separator` property to define how events patch should be parsed.
 By default events path separator is `.` and your events path should looks like:
 ```javascript
+var observer = new EventsObserver();
 observer.on('event_1.sub-event_1.sub-event_1_1', ...);
-// but if you change separator setting, for example to "/" it will looks like:
+```
+but if you change separator setting, for example to "/", it will looks like:
+```javascript
+var observer = new EventsObserver('/');
 observer.on('event_1/sub-event_1/sub-event_1_1', ...);
 ```
 
