@@ -26,7 +26,8 @@
   "main": "build/index.min.js",
   "scripts": {
     "start": "webpack-dev-server --config ./config/webpack.config.js",
-    "build": "rollup -c ./config/rollup.config.js",
+    "build": "npm-run-all -s rollup minify",
+    "rollup": "rollup -c ./config/rollup.config.js",
     "server": "node ./server/server.js",
     "minify": "minify ./build/index.js --out-file ./build/index.min.js --mangle.keepClassName",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -47,6 +48,7 @@
     "rollup-plugin-babel": "^3.0.4",
     "rollup-plugin-node-resolve": "^3.3.0",
     "webpack": "^4.8.3",
-    "webpack-cli": "^2.1.4"
+    "webpack-cli": "^2.1.4",
+    "npm-run-all": "^4.1.3"
   }
 }
