@@ -15,7 +15,7 @@ If event handler returns promise next handler will be executed only if previous 
 
 <img src="https://raw.githubusercontent.com/OleksandrKukla/events-observer/master/src/img/scheme.png" width="100%" style="display: block;">
 
-[npm-badge]https://img.shields.io/npm/v/events-observer.svg
-[npm-badge-url]:https://www.npmjs.com/package/events-observer
+[npm-badge]: https://img.shields.io/npm/v/events-observer.svg
+[npm-badge-url]: https://www.npmjs.com/package/events-observer
 [license-badge]: https://img.shields.io/npm/l/events-observer.svg
 [license-badge-url]: ./LICENSE
