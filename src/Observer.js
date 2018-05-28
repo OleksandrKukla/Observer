@@ -61,17 +61,20 @@ class Observer {
         params
     }) {
         let isLast = (path.length <= 1),
-            eventName = path.shift(); // returns first element
+            eventName = path.shift(), // returns first element
+            hasEvent = state.check(eventName);
 
-        if (!state.check(eventName) && createIfEmpty) {
+        if (!hasEvent && createIfEmpty) {
             state.push(
                 eventName,
                 new OrderServer()
             );
+
+            hasEvent = true;
         }
 
         if (isLast) {
-            destinationCallback({state, eventName, params});
+            hasEvent && destinationCallback({state, eventName, params});
         } else {
             state = state.getItem(eventName);
             this[_walkRecursive]({
