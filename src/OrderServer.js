@@ -1,23 +1,20 @@
-const _order = Symbol('_order');
-const _processPromise = Symbol('_processPromise');
-
 class OrderServer {
 
     constructor() {
-        this[_order] = [];
-        this[_processPromise] = new Promise (resolve => resolve());
+        this.__order = [];
+        this.__processPromise = new Promise (resolve => resolve());
     }
 
     push(name, element) {
-        this[_order].push(name);
+        this.__order.push(name);
         this[name] = element;
     }
 
     delete(name) {
-        this[_processPromise].then(() => {
-            let index = this[_order].findIndex(_name => _name === name);
+        this.__processPromise.then(() => {
+            let index = this.__order.findIndex(_name => _name === name);
 
-            this[_order].splice(index, 1);
+            this.__order.splice(index, 1);
             delete this[name];
         });
     }
@@ -33,12 +30,12 @@ class OrderServer {
     async eachInOrder(callback) {
         let resolve = () => {};
 
-        this[_processPromise] = new Promise (_resolve => {
+        this.__processPromise = new Promise (_resolve => {
             // open closure to resolve after async operations
             resolve = _resolve;
         });
 
-        for (name of this[_order]) {
+        for (name of this.__order) {
             await callback(name, this[name]);
         }
 
